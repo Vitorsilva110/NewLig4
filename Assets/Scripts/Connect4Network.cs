@@ -126,17 +126,35 @@ public class Connect4Network : MonoBehaviour
 
     void HandleMessage(string msg)
     {
-        if(msg == "LIGHT_ON")
+        if(msg.StartsWith("PLAY_"))
         {
-            MainThreadAction(
-                () => remoteCube.SetActive(true));
-        }
+            string[] data =
+                msg.Split('_');
 
-        if(msg == "LIGHT_OFF")
-        {
-            MainThreadAction(
-                () => remoteCube.SetActive(false));
+            int column =
+                int.Parse(data[1]);
+
+            int player =
+                int.Parse(data[2]);
+
+            MainThreadAction(() =>
+            {
+                PieceSpawner.Instance.ReceivePlay(
+                    column,
+                    player);
+            });
         }
+    }
+
+    public void SendPlay(
+        int column,
+        int player)
+    {
+        Send(
+            "PLAY_" +
+            column +
+            "_" +
+            player);
     }
 
     Queue<System.Action> actions =

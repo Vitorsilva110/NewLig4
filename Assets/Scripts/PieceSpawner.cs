@@ -2,6 +2,8 @@ using UnityEngine;
 
 public class PieceSpawner : MonoBehaviour
 {
+    public static PieceSpawner Instance;
+    
     public GameObject redPiece;
     public GameObject yellowPiece;
 
@@ -9,6 +11,11 @@ public class PieceSpawner : MonoBehaviour
 
     int width = 7;
     int height = 6;
+
+    void Awake()
+    {
+        Instance = this;
+    }
 
     void Start()
     {
@@ -44,7 +51,7 @@ public class PieceSpawner : MonoBehaviour
         {
             if (gridData.grid[column, y] == 0)
             {
-                SpawnPiece(column, y);
+                SpawnPiece(column, y, GameManager.Instance.currentPlayer);
 
                 CheckWin();
 
@@ -60,37 +67,74 @@ public class PieceSpawner : MonoBehaviour
         }
     }
 
-    void SpawnPiece(int x, int y)
+    public void ReceivePlay(
+        int column,
+        int player)
+    {
+        SpawnRemotePiece(
+            column,
+            player);
+    }
+
+    void SpawnRemotePiece(
+        int column,
+        int player)
+    {
+        for(int y = 0; y < height; y++)
+        {
+            if(gridData.grid[column, y] == 0)
+            {
+                SpawnPiece(column, y, GameManager.Instance.currentPlayer);
+
+                CheckWin();
+
+                CheckDraw();
+
+                if(!GameManager.Instance.gameEnded)
+                {
+                    GameManager.Instance.ChangeTurn();
+                }
+
+                break;
+            }
+        }
+    }
+
+    void SpawnPiece(
+        int x,
+        int y,
+        int player)
     {
         GameObject prefab;
 
-        int player =
-            GameManager.Instance.currentPlayer;
-
-        if (player == 1)
+        if(player == 1)
         {
             prefab = redPiece;
-
             gridData.grid[x, y] = 1;
         }
         else
         {
             prefab = yellowPiece;
-
             gridData.grid[x, y] = 2;
         }
 
-        GameObject piece = Instantiate(
-            prefab,
-            new Vector3(x, height + 1, 0),
-            Quaternion.identity
-        );
+        GameObject piece =
+            Instantiate(
+                prefab,
+                new Vector3(
+                    x,
+                    height + 1,
+                    0),
+                Quaternion.identity);
 
         FallingPiece fallingPiece =
             piece.GetComponent<FallingPiece>();
 
         fallingPiece.targetPosition =
-            new Vector3(x, y, 0);
+            new Vector3(
+                x,
+                y,
+                0);
     }
 
     void CheckWin()
