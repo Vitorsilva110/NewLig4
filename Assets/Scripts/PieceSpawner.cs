@@ -12,6 +12,8 @@ public class PieceSpawner : MonoBehaviour
     int width = 7;
     int height = 6;
 
+    public Connect4Network network;
+
     void Awake()
     {
         Instance = this;
@@ -33,6 +35,20 @@ public class PieceSpawner : MonoBehaviour
 
     void DetectColumn()
     {
+        if(network != null)
+        {
+            if(network.isServer &&
+            GameManager.Instance.currentPlayer != 1)
+            {
+                return;
+            }
+
+            if(!network.isServer &&
+            GameManager.Instance.currentPlayer != 2)
+            {
+                return;
+            }
+        }
         Vector3 mousePosition =
             Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
@@ -52,6 +68,13 @@ public class PieceSpawner : MonoBehaviour
             if (gridData.grid[column, y] == 0)
             {
                 SpawnPiece(column, y, GameManager.Instance.currentPlayer);
+
+                if(network != null)
+                {
+                    network.SendPlay(
+                        column,
+                        GameManager.Instance.currentPlayer);
+                }
 
                 CheckWin();
 
@@ -84,7 +107,7 @@ public class PieceSpawner : MonoBehaviour
         {
             if(gridData.grid[column, y] == 0)
             {
-                SpawnPiece(column, y, GameManager.Instance.currentPlayer);
+                SpawnPiece(column, y, player);
 
                 CheckWin();
 
