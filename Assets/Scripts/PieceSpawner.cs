@@ -26,15 +26,6 @@ public class PieceSpawner : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonDown(0)
-            && !GameManager.Instance.gameEnded)
-        {
-            DetectColumn();
-        }
-    }
-
-    void DetectColumn()
-    {
         if(network != null)
         {
             if(network.isServer &&
@@ -49,6 +40,16 @@ public class PieceSpawner : MonoBehaviour
                 return;
             }
         }
+
+        if (Input.GetMouseButtonDown(0)
+            && !GameManager.Instance.gameEnded)
+        {
+            DetectColumn();
+        }
+    }
+
+    void DetectColumn()
+    {
         Vector3 mousePosition =
             Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
