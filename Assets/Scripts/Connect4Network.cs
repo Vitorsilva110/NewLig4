@@ -205,26 +205,23 @@ public class Connect4Network : MonoBehaviour
     }
 
     void Update()
+{
+    lock(messages)
     {
-        lock(messages)
+        while(messages.Count > 0)
         {
-            while(messages.Count > 0)
-            {
-                logText.text +=
-                    "\n" +
-                    messages.Dequeue();
-            }
-        }
-
-        lock(actions)
-        {
-            while(actions.Count > 0)
-            {
-                actions.Dequeue().Invoke();
-            }
+            messages.Dequeue();
         }
     }
 
+    lock(actions)
+    {
+        while(actions.Count > 0)
+        {
+            actions.Dequeue().Invoke();
+        }
+    }
+}
     void OnDestroy()
     {
         receiveThread?.Abort();
